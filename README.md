@@ -323,4 +323,111 @@ The API includes a health check endpoint at `/health` that monitors:
 - Server status
 - Database connectivity
 - Current timestamp
+
+## Deployment
+
+### Prerequisites
+
+1. A Render account (https://render.com)
+2. A MySQL database (you can use PlanetScale, AWS RDS, or any other MySQL provider)
+3. Your project pushed to a GitHub repository
+
+### Deployment Steps
+
+1. **Database Setup**
+   - Create a MySQL database in your chosen provider
+   - Note down the database connection URL
+   - Run migrations on the production database:
+     ```bash
+     DATABASE_URL=your_mysql_url npm run migrate
+     ```
+
+2. **Render Setup**
+
+   a. Create a new Web Service:
+   - Go to your Render dashboard
+   - Click "New +" and select "Web Service"
+   - Connect your GitHub repository
+   
+   b. Configure the service:
+   - Name: your-api-name
+   - Environment: Node
+   - Build Command: `npm install`
+   - Start Command: `npm start`
+   
+   c. Add environment variables:
+   ```
+   NODE_ENV=production
+   PORT=3000
+   DATABASE_URL=your_mysql_url
+   JWT_SECRET=your_production_jwt_secret
+   JWT_EXPIRATION=24h
+   API_URL=https://your-api-domain.com
+   CORS_ORIGIN=https://your-frontend-domain.com
+   RATE_LIMIT_WINDOW_MS=900000
+   RATE_LIMIT_MAX_REQUESTS=100
+   LOG_LEVEL=info
+   ```
+
+   d. Set the following:
+   - Auto-Deploy: Yes
+   - Branch: main
+
+3. **Post-Deployment**
+
+   After deployment, your API will be available at:
+   ```
+   https://your-api-name.onrender.com
+   ```
+
+   The Swagger documentation will be available at:
+   ```
+   https://your-api-name.onrender.com/api-docs
+   ```
+
+### Monitoring and Maintenance
+
+1. **Logs**
+   - View logs in the Render dashboard
+   - Monitor API health at `/health` endpoint
+
+2. **Database Management**
+   - Run migrations after schema changes:
+     ```bash
+     DATABASE_URL=your_mysql_url npm run migrate
+     ```
+   - Rollback if needed:
+     ```bash
+     DATABASE_URL=your_mysql_url npm run migrate:rollback
+     ```
+
+3. **Performance Monitoring**
+   - Use Render's built-in metrics
+   - Monitor response times and error rates
+   - Check rate limiting effectiveness
+
+### Security Considerations
+
+1. Always use HTTPS (enabled by default on Render)
+2. Keep dependencies updated
+3. Regularly rotate JWT secrets
+4. Monitor failed authentication attempts
+5. Review rate limiting settings based on usage
+
+### Troubleshooting
+
+1. **Database Connection Issues**
+   - Verify DATABASE_URL is correct
+   - Check database server allows connections from Render IPs
+   - Verify database credentials
+
+2. **Application Errors**
+   - Check Render logs for error messages
+   - Verify all environment variables are set
+   - Check if migrations ran successfully
+
+3. **Performance Issues**
+   - Monitor database connection pool settings
+   - Check rate limiting configuration
+   - Review API response times in logs
  
