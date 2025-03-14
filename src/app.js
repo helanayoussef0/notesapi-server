@@ -96,6 +96,15 @@ app.get('/health', async (req, res) => {
   }
 });
 
+app.get('/', (req, res) => {
+  res.json({
+    status: 'ok',
+    message: 'Notes API is running',
+    environment: process.env.NODE_ENV,
+    timestamp: new Date().toISOString()
+  });
+});
+
 app.use((req, res, next) => {
   res.status(404).json({
     success: false,
@@ -122,12 +131,29 @@ const initializeApp = async () => {
     }
   } catch (error) {
     logger.error(`Failed to initialize app: ${error.message}`);
+    logger.error(`Stack trace: ${error.stack}`);
     process.exit(1);
   }
 };
 
+process.on('uncaughtException', (error) => {
+  logger.error(`Uncaught Exception: ${error.message}`);
+  logger.error(`Stack trace: ${error.stack}`);
+  process.exit(1);
+});
+
+process.on('unhandledRejection', (error) => {
+  logger.error(`Unhandled Rejection: ${error.message}`);
+  logger.error(`Stack trace: ${error.stack}`);
+  process.exit(1);
+});
+
 if (process.env.NODE_ENV !== 'test') {
-  initializeApp();
+  initializeApp().catch((error) => {
+    logger.error(`Failed to start app: ${error.message}`);
+    logger.error(`Stack trace: ${error.stack}`);
+    process.exit(1);
+  });
 }
 
 module.exports = { app, PORT };
