@@ -1,11 +1,21 @@
-require('dotenv').config();
+const path = require('path');
+const fs = require('fs');
+
+if (process.env.NODE_ENV === 'production') {
+  const prodEnvPath = path.join(__dirname, '../.env.production.local');
+  if (fs.existsSync(prodEnvPath)) {
+    require('dotenv').config({ path: prodEnvPath, override: true });
+  }
+} else {
+  require('dotenv').config();
+}
+
 const express = require('express');
 const cors = require('cors');
 const helmet = require('helmet');
 const compression = require('compression');
 const swaggerUi = require('swagger-ui-express');
 const YAML = require('yamljs');
-const path = require('path');
 const { v4: uuidv4 } = require('uuid');
 
 const { db, testConnection } = require('./config/database');

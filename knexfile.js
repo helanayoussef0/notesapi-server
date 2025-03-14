@@ -1,4 +1,14 @@
-require('dotenv').config();
+const path = require('path');
+const fs = require('fs');
+
+if (process.env.NODE_ENV === 'production') {
+  const prodEnvPath = path.join(__dirname, '.env.production.local');
+  if (fs.existsSync(prodEnvPath)) {
+    require('dotenv').config({ path: prodEnvPath, override: true });
+  }
+} else {
+  require('dotenv').config();
+}
 
 module.exports = {
   development: {
@@ -53,7 +63,9 @@ module.exports = {
       user: process.env.DB_USER,
       password: process.env.DB_PASSWORD,
       database: process.env.DB_NAME,
-      ssl: { rejectUnauthorized: false }
+      ssl: {
+        rejectUnauthorized: false
+      }
     },
     migrations: {
       directory: './src/db/migrations'
