@@ -121,6 +121,14 @@ const PORT = process.env.PORT || (process.env.NODE_ENV === 'test' ? 3002 : 3001)
 
 const initializeApp = async () => {
   try {
+    logger.info('Starting application initialization...');
+    logger.info(`Environment: ${process.env.NODE_ENV}`);
+    logger.info(`Database Host: ${process.env.DB_HOST}`);
+    logger.info(`Database Port: ${process.env.DB_PORT}`);
+    logger.info(`Database Name: ${process.env.DB_NAME}`);
+    logger.info(`Database User: ${process.env.DB_USER ? '****' : 'not set'}`);
+    logger.info(`Database Password: ${process.env.DB_PASSWORD ? '****' : 'not set'}`);
+    
     await testConnection();
     
     if (process.env.NODE_ENV !== 'test') {
