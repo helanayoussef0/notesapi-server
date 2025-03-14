@@ -57,7 +57,7 @@ app.use((req, res, next) => {
   req.id = uuidv4();
   res.setHeader('X-Request-ID', req.id);
   
-  logger.info({
+  logger.info(`Incoming ${req.method} request to ${req.originalUrl}`, {
     requestId: req.id,
     method: req.method,
     url: req.originalUrl,
@@ -145,7 +145,10 @@ const initializeApp = async () => {
     if (process.env.NODE_ENV !== 'test') {
       app.listen(PORT, () => {
         logger.info(`Server running on port ${PORT}`);
-        logger.info(`Swagger documentation available at http://localhost:${PORT}/api-docs`);
+        const docsUrl = process.env.NODE_ENV === 'production' 
+          ? `${process.env.API_URL}/api-docs`
+          : `http://localhost:${PORT}/api-docs`;
+        logger.info(`Swagger documentation available at ${docsUrl}`);
       });
     }
   } catch (error) {

@@ -329,13 +329,20 @@ The API includes a health check endpoint at `/health` that monitors:
 ### Prerequisites
 
 1. A Render account (https://render.com)
-2. A MySQL database (you can use PlanetScale, AWS RDS, or any other MySQL provider)
+2. A MySQL database (PlanetScale is currently used in production)
 3. Your project pushed to a GitHub repository
+
+### Production Environment
+
+The API is currently deployed and running at:
+- **Production URL**: https://notesapi-wh1h.onrender.com
+- **API Documentation**: https://notesapi-wh1h.onrender.com/api-docs
+- **Database**: PlanetScale MySQL database
 
 ### Deployment Steps
 
 1. **Database Setup**
-   - Create a MySQL database in your chosen provider
+   - Set up a PlanetScale MySQL database
    - Note down the database connection URL
    - Run migrations on the production database:
      ```bash
@@ -350,7 +357,7 @@ The API includes a health check endpoint at `/health` that monitors:
    - Connect your GitHub repository
    
    b. Configure the service:
-   - Name: your-api-name
+   - Name: notes-api
    - Environment: Node
    - Build Command: `npm install`
    - Start Command: `npm start`
@@ -359,10 +366,10 @@ The API includes a health check endpoint at `/health` that monitors:
    ```
    NODE_ENV=production
    PORT=3000
-   DATABASE_URL=your_mysql_url
+   DATABASE_URL=your_planetscale_url
    JWT_SECRET=your_production_jwt_secret
    JWT_EXPIRATION=24h
-   API_URL=https://your-api-domain.com
+   API_URL=https://notesapi-wh1h.onrender.com
    CORS_ORIGIN=https://your-frontend-domain.com
    RATE_LIMIT_WINDOW_MS=900000
    RATE_LIMIT_MAX_REQUESTS=100
@@ -373,58 +380,40 @@ The API includes a health check endpoint at `/health` that monitors:
    - Auto-Deploy: Yes
    - Branch: main
 
-3. **Post-Deployment**
-
-   After deployment, your API will be available at:
-   ```
-   https://your-api-name.onrender.com
-   ```
-
-   The Swagger documentation will be available at:
-   ```
-   https://your-api-name.onrender.com/api-docs
-   ```
+3. **Verify Deployment**
+   - Check the health endpoint: https://notesapi-wh1h.onrender.com/health
+   - Access Swagger docs: https://notesapi-wh1h.onrender.com/api-docs
+   - Monitor logs in Render dashboard
 
 ### Monitoring and Maintenance
 
 1. **Logs**
    - View logs in the Render dashboard
    - Monitor API health at `/health` endpoint
+   - Check error logs in `logs/error.log`
+   - Review combined logs in `logs/combined.log`
 
 2. **Database Management**
    - Run migrations after schema changes:
      ```bash
-     DATABASE_URL=your_mysql_url npm run migrate
+     DATABASE_URL=your_planetscale_url npm run migrate
      ```
    - Rollback if needed:
      ```bash
-     DATABASE_URL=your_mysql_url npm run migrate:rollback
+     DATABASE_URL=your_planetscale_url npm run migrate:rollback
      ```
-
-3. **Performance Monitoring**
-   - Use Render's built-in metrics
-   - Monitor response times and error rates
-   - Check rate limiting effectiveness
-
-### Security Considerations
-
-1. Always use HTTPS (enabled by default on Render)
-2. Keep dependencies updated
-3. Regularly rotate JWT secrets
-4. Monitor failed authentication attempts
-5. Review rate limiting settings based on usage
 
 ### Troubleshooting
 
 1. **Database Connection Issues**
-   - Verify DATABASE_URL is correct
-   - Check database server allows connections from Render IPs
+   - Verify PlanetScale connection URL is correct
+   - Check if the database is accessible
    - Verify database credentials
 
 2. **Application Errors**
    - Check Render logs for error messages
    - Verify all environment variables are set
-   - Check if migrations ran successfully
+   - Monitor the health endpoint status
 
 3. **Performance Issues**
    - Monitor database connection pool settings
