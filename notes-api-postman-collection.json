@@ -1,0 +1,386 @@
+{
+    "info": {
+      "_postman_id": "a7e8d5c9-3c74-4b1f-9b19-2bc2f9c7c52d",
+      "name": "Notes API",
+      "description": "A secure and scalable RESTful API for notes management",
+      "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+    },
+    "item": [
+      {
+        "name": "Authentication",
+        "item": [
+          {
+            "name": "Register User",
+            "request": {
+              "method": "POST",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": {
+                "mode": "raw",
+                "raw": "{\n    \"username\": \"testuser\",\n    \"email\": \"test@example.com\",\n    \"password\": \"Password123\",\n    \"full_name\": \"Test User\"\n}"
+              },
+              "url": {
+                "raw": "{{baseUrl}}/api/auth/signup",
+                "host": [
+                  "{{baseUrl}}"
+                ],
+                "path": [
+                  "api",
+                  "auth",
+                  "signup"
+                ]
+              },
+              "description": "Create a new user account"
+            },
+            "response": []
+          },
+          {
+            "name": "Login",
+            "request": {
+              "method": "POST",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": {
+                "mode": "raw",
+                "raw": "{\n    \"email\": \"test@example.com\",\n    \"password\": \"Password123\"\n}"
+              },
+              "url": {
+                "raw": "{{baseUrl}}/api/auth/login",
+                "host": [
+                  "{{baseUrl}}"
+                ],
+                "path": [
+                  "api",
+                  "auth",
+                  "login"
+                ]
+              },
+              "description": "Log in to an existing user account and receive an access token"
+            },
+            "response": []
+          },
+          {
+            "name": "Get Profile",
+            "request": {
+              "method": "GET",
+              "header": [
+                {
+                  "key": "Authorization",
+                  "value": "Bearer {{token}}"
+                }
+              ],
+              "url": {
+                "raw": "{{baseUrl}}/api/auth/profile",
+                "host": [
+                  "{{baseUrl}}"
+                ],
+                "path": [
+                  "api",
+                  "auth",
+                  "profile"
+                ]
+              },
+              "description": "Get user profile information"
+            },
+            "response": []
+          }
+        ],
+        "description": "Authentication endpoints for signup and login"
+      },
+      {
+        "name": "Notes",
+        "item": [
+          {
+            "name": "Get All Notes",
+            "request": {
+              "method": "GET",
+              "header": [
+                {
+                  "key": "Authorization",
+                  "value": "Bearer {{token}}"
+                }
+              ],
+              "url": {
+                "raw": "{{baseUrl}}/api/notes?page=1&limit=10&archived=false",
+                "host": [
+                  "{{baseUrl}}"
+                ],
+                "path": [
+                  "api",
+                  "notes"
+                ],
+                "query": [
+                  {
+                    "key": "page",
+                    "value": "1"
+                  },
+                  {
+                    "key": "limit",
+                    "value": "10"
+                  },
+                  {
+                    "key": "archived",
+                    "value": "false"
+                  }
+                ]
+              },
+              "description": "Get a list of all notes for the authenticated user"
+            },
+            "response": []
+          },
+          {
+            "name": "Get Note by ID",
+            "request": {
+              "method": "GET",
+              "header": [
+                {
+                  "key": "Authorization",
+                  "value": "Bearer {{token}}"
+                }
+              ],
+              "url": {
+                "raw": "{{baseUrl}}/api/notes/{{noteId}}",
+                "host": [
+                  "{{baseUrl}}"
+                ],
+                "path": [
+                  "api",
+                  "notes",
+                  "{{noteId}}"
+                ]
+              },
+              "description": "Get a note by ID for the authenticated user"
+            },
+            "response": []
+          },
+          {
+            "name": "Create Note",
+            "request": {
+              "method": "POST",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                },
+                {
+                  "key": "Authorization",
+                  "value": "Bearer {{token}}"
+                }
+              ],
+              "body": {
+                "mode": "raw",
+                "raw": "{\n    \"title\": \"My First Note\",\n    \"content\": \"This is the content of my first note.\",\n    \"is_archived\": false\n}"
+              },
+              "url": {
+                "raw": "{{baseUrl}}/api/notes",
+                "host": [
+                  "{{baseUrl}}"
+                ],
+                "path": [
+                  "api",
+                  "notes"
+                ]
+              },
+              "description": "Create a new note for the authenticated user"
+            },
+            "response": []
+          },
+          {
+            "name": "Update Note",
+            "request": {
+              "method": "PUT",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                },
+                {
+                  "key": "Authorization",
+                  "value": "Bearer {{token}}"
+                }
+              ],
+              "body": {
+                "mode": "raw",
+                "raw": "{\n    \"title\": \"Updated Note Title\",\n    \"content\": \"This is the updated content of my note.\"\n}"
+              },
+              "url": {
+                "raw": "{{baseUrl}}/api/notes/{{noteId}}",
+                "host": [
+                  "{{baseUrl}}"
+                ],
+                "path": [
+                  "api",
+                  "notes",
+                  "{{noteId}}"
+                ]
+              },
+              "description": "Update an existing note by ID for the authenticated user"
+            },
+            "response": []
+          },
+          {
+            "name": "Delete Note",
+            "request": {
+              "method": "DELETE",
+              "header": [
+                {
+                  "key": "Authorization",
+                  "value": "Bearer {{token}}"
+                }
+              ],
+              "url": {
+                "raw": "{{baseUrl}}/api/notes/{{noteId}}",
+                "host": [
+                  "{{baseUrl}}"
+                ],
+                "path": [
+                  "api",
+                  "notes",
+                  "{{noteId}}"
+                ]
+              },
+              "description": "Delete a note by ID for the authenticated user"
+            },
+            "response": []
+          },
+          {
+            "name": "Share Note",
+            "request": {
+              "method": "POST",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                },
+                {
+                  "key": "Authorization",
+                  "value": "Bearer {{token}}"
+                }
+              ],
+              "body": {
+                "mode": "raw",
+                "raw": "{\n    \"email\": \"share@example.com\"\n}"
+              },
+              "url": {
+                "raw": "{{baseUrl}}/api/notes/{{noteId}}/share",
+                "host": [
+                  "{{baseUrl}}"
+                ],
+                "path": [
+                  "api",
+                  "notes",
+                  "{{noteId}}",
+                  "share"
+                ]
+              },
+              "description": "Share a note with another user for the authenticated user"
+            },
+            "response": []
+          },
+          {
+            "name": "Search Notes",
+            "request": {
+              "method": "GET",
+              "header": [
+                {
+                  "key": "Authorization",
+                  "value": "Bearer {{token}}"
+                }
+              ],
+              "url": {
+                "raw": "{{baseUrl}}/api/notes/search?q=test&page=1&limit=10",
+                "host": [
+                  "{{baseUrl}}"
+                ],
+                "path": [
+                  "api",
+                  "notes",
+                  "search"
+                ],
+                "query": [
+                  {
+                    "key": "q",
+                    "value": "test"
+                  },
+                  {
+                    "key": "page",
+                    "value": "1"
+                  },
+                  {
+                    "key": "limit",
+                    "value": "10"
+                  }
+                ]
+              },
+              "description": "Search for notes based on keywords for the authenticated user"
+            },
+            "response": []
+          }
+        ],
+        "description": "Endpoints for managing notes"
+      },
+      {
+        "name": "Health Check",
+        "request": {
+          "method": "GET",
+          "header": [],
+          "url": {
+            "raw": "{{baseUrl}}/health",
+            "host": [
+              "{{baseUrl}}"
+            ],
+            "path": [
+              "health"
+            ]
+          },
+          "description": "Check the health of the API"
+        },
+        "response": []
+      }
+    ],
+    "event": [
+      {
+        "listen": "prerequest",
+        "script": {
+          "type": "text/javascript",
+          "exec": [
+            ""
+          ]
+        }
+      },
+      {
+        "listen": "test",
+        "script": {
+          "type": "text/javascript",
+          "exec": [
+            ""
+          ]
+        }
+      }
+    ],
+    "variable": [
+      {
+        "key": "baseUrl",
+        "value": "http://localhost:3001",
+        "type": "string"
+      },
+      {
+        "key": "token",
+        "value": "your_jwt_token_here",
+        "type": "string"
+      },
+      {
+        "key": "noteId",
+        "value": "1",
+        "type": "string"
+      }
+    ]
+  }

@@ -1,0 +1,43 @@
+services:
+  - type: web
+    name: notesapi
+    env: node
+    plan: free
+    buildCommand: npm ci
+    startCommand: npm start
+    healthCheckPath: /health
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 3001
+      - key: DB_HOST
+        fromDatabase:
+          name: notes-db
+          property: host
+      - key: DB_PORT
+        fromDatabase:
+          name: notes-db
+          property: port
+      - key: DB_USER
+        fromDatabase:
+          name: notes-db
+          property: user
+      - key: DB_PASSWORD
+        fromDatabase:
+          name: notes-db
+          property: password
+      - key: DB_NAME
+        fromDatabase:
+          name: notes-db
+          property: database
+      - key: JWT_SECRET
+        generateValue: true
+      - key: JWT_EXPIRES_IN
+        value: 24h
+
+databases:
+  - name: notes-db
+    plan: free
+    databaseName: notes_api
+    user: notes_user
