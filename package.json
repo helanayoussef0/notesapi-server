@@ -30,7 +30,8 @@
     "swagger-jsdoc": "^6.2.8",
     "swagger-ui-express": "^5.0.0",
     "uuid": "^11.1.0",
-    "winston": "^3.11.0"
+    "winston": "^3.11.0",
+    "yamljs": "^0.3.0"
   },
   "devDependencies": {
     "eslint": "^8.56.0",

@@ -3,9 +3,10 @@ const express = require('express');
 const cors = require('cors');
 const helmet = require('helmet');
 const compression = require('compression');
-const swaggerJSDoc = require('swagger-jsdoc');
-const swaggerUi = require('swagger-ui-express');
 const { v4: uuidv4 } = require('uuid');
+const swaggerUi = require('swagger-ui-express');
+const YAML = require('yamljs');
+const path = require('path');
 
 const { db, testConnection } = require('./config/database');
 const { handleError } = require('./utils/errorHandler');
@@ -17,45 +18,30 @@ const notesRoutes = require('./api/routes/notes');
 
 const app = express();
 
-const swaggerOptions = {
-  definition: {
+let swaggerDocument;
+try {
+  swaggerDocument = YAML.load(path.join(__dirname, '../swagger.yaml'));
+  
+  if (swaggerDocument.servers && swaggerDocument.servers.length > 0) {
+    swaggerDocument.servers[0].url = process.env.API_URL || 'http://localhost:3001';
+  }
+} catch (error) {
+  logger.error(`Failed to load Swagger document: ${error.message}`);
+  swaggerDocument = {
     openapi: '3.0.0',
     info: {
       title: 'Notes API',
       version: '1.0.0',
-      description: 'Secure and scalable RESTful API for managing notes'
-    },
-    servers: [
-      {
-        url: process.env.API_URL || 'http://localhost:3000',
-        description: 'Development server'
-      }
-    ],
-    components: {
-      securitySchemes: {
-        bearerAuth: {
-          type: 'http',
-          scheme: 'bearer',
-          bearerFormat: 'JWT'
-        }
-      }
-    },
-    security: [
-      {
-        bearerAuth: []
-      }
-    ]
-  },
-  apis: ['./src/api/routes/*.js']
-};
-
-const swaggerSpec = swaggerJSDoc(swaggerOptions);
+      description: 'API documentation unavailable'
+    }
+  };
+}
 
 app.use(helmet()); 
 app.use(cors()); 
 app.use(compression()); 
 app.use(express.json()); 
-app.use(express.urlencoded({ extended: true })); // Parse URL-encoded bodies
+app.use(express.urlencoded({ extended: true })); 
 
 app.use((req, res, next) => {
   req.id = uuidv4();
@@ -76,7 +62,7 @@ app.use(globalLimiter);
 app.use('/api/auth', authRoutes);
 app.use('/api/notes', notesRoutes);
 
-app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
 app.get('/health', async (req, res) => {
   try {
@@ -126,8 +112,8 @@ const startServer = async () => {
 };
 
 if (process.env.NODE_ENV !== 'test') {
-    startServer();
-  }
+  startServer();
+}
 
 process.on('unhandledRejection', (error) => {
   logger.error('Unhandled Rejection:', error);
