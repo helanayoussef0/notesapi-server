@@ -25,7 +25,15 @@ const register = async (userData) => {
 
 const login = async (email, password) => {
   try {
-    const user = await UserModel.findUserByEmail(email);
+    let user;
+    try {
+      user = await UserModel.findUserByEmail(email);
+    } catch (error) {
+      if (error.code === 'USER_NOT_FOUND') {
+        throw new AppError('Invalid credentials', 401, 'INVALID_CREDENTIALS');
+      }
+      throw error;
+    }
     
     if (!user.is_active) {
       throw new AppError('Account is deactivated', 403, 'ACCOUNT_DEACTIVATED');

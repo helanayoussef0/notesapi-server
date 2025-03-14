@@ -3,10 +3,9 @@ const express = require('express');
 const cors = require('cors');
 const helmet = require('helmet');
 const compression = require('compression');
-const { v4: uuidv4 } = require('uuid');
+const swaggerJSDoc = require('swagger-jsdoc');
 const swaggerUi = require('swagger-ui-express');
-const YAML = require('yamljs');
-const path = require('path');
+const { v4: uuidv4 } = require('uuid');
 
 const { db, testConnection } = require('./config/database');
 const { handleError } = require('./utils/errorHandler');
@@ -18,30 +17,45 @@ const notesRoutes = require('./api/routes/notes');
 
 const app = express();
 
-let swaggerDocument;
-try {
-  swaggerDocument = YAML.load(path.join(__dirname, '../swagger.yaml'));
-  
-  if (swaggerDocument.servers && swaggerDocument.servers.length > 0) {
-    swaggerDocument.servers[0].url = process.env.API_URL || 'http://localhost:3001';
-  }
-} catch (error) {
-  logger.error(`Failed to load Swagger document: ${error.message}`);
-  swaggerDocument = {
+const swaggerOptions = {
+  definition: {
     openapi: '3.0.0',
     info: {
       title: 'Notes API',
       version: '1.0.0',
-      description: 'API documentation unavailable'
-    }
-  };
-}
+      description: 'Secure and scalable RESTful API for managing notes'
+    },
+    servers: [
+      {
+        url: process.env.API_URL || 'http://localhost:3000',
+        description: 'Development server'
+      }
+    ],
+    components: {
+      securitySchemes: {
+        bearerAuth: {
+          type: 'http',
+          scheme: 'bearer',
+          bearerFormat: 'JWT'
+        }
+      }
+    },
+    security: [
+      {
+        bearerAuth: []
+      }
+    ]
+  },
+  apis: ['./src/api/routes/*.js']
+};
+
+const swaggerSpec = swaggerJSDoc(swaggerOptions);
 
 app.use(helmet()); 
 app.use(cors()); 
 app.use(compression()); 
 app.use(express.json()); 
-app.use(express.urlencoded({ extended: true })); 
+app.use(express.urlencoded({ extended: true }));
 
 app.use((req, res, next) => {
   req.id = uuidv4();
@@ -62,7 +76,7 @@ app.use(globalLimiter);
 app.use('/api/auth', authRoutes);
 app.use('/api/notes', notesRoutes);
 
-app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
 app.get('/health', async (req, res) => {
   try {
@@ -95,33 +109,26 @@ app.use((req, res, next) => {
 
 app.use(handleError);
 
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || (process.env.NODE_ENV === 'test' ? 3002 : 3001);
 
-const startServer = async () => {
+const initializeApp = async () => {
   try {
     await testConnection();
     
-    app.listen(PORT, () => {
-      logger.info(`Server running on port ${PORT}`);
-      logger.info(`Swagger documentation available at http://localhost:${PORT}/api-docs`);
-    });
+    if (process.env.NODE_ENV !== 'test') {
+      app.listen(PORT, () => {
+        logger.info(`Server running on port ${PORT}`);
+        logger.info(`Swagger documentation available at http://localhost:${PORT}/api-docs`);
+      });
+    }
   } catch (error) {
-    logger.error(`Failed to start server: ${error.message}`);
+    logger.error(`Failed to initialize app: ${error.message}`);
     process.exit(1);
   }
 };
 
 if (process.env.NODE_ENV !== 'test') {
-  startServer();
+  initializeApp();
 }
 
-process.on('unhandledRejection', (error) => {
-  logger.error('Unhandled Rejection:', error);
-});
-
-process.on('uncaughtException', (error) => {
-  logger.error('Uncaught Exception:', error);
-  process.exit(1);
-});
-
-module.exports = app;
+module.exports = { app, PORT };

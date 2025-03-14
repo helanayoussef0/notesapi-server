@@ -9,10 +9,11 @@
     "migrate": "knex migrate:latest",
     "migrate:rollback": "knex migrate:rollback",
     "seed": "knex seed:run",
-    "test": "jest --config=jest.config.js",
-    "test:unit": "jest --config=jest.config.js --testPathPattern=tests/unit",
-    "test:integration": "jest --config=jest.config.js --testPathPattern=tests/integration",
-    "test:e2e": "jest --config=jest.config.js --testPathPattern=tests/e2e",
+    "test": "jest --config=jest.config.js --runInBand --detectOpenHandles",
+    "test:unit": "jest --runInBand --detectOpenHandles --testPathPattern=tests/unit",
+    "test:integration": "jest --runInBand --detectOpenHandles --testPathPattern=tests/integration",
+    "test:e2e": "jest --runInBand --detectOpenHandles --testPathPattern=tests/e2e",
+    "test:coverage": "jest --coverage --runInBand --detectOpenHandles",
     "lint": "eslint ."
   },
   "dependencies": {

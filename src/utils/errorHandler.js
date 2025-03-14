@@ -20,10 +20,14 @@ const handleError = (err, req, res, next) => {
     statusCode = 400;
     message = err.message;
     errorCode = 'VALIDATION_ERROR';
-  } else if (err.name === 'UnauthorizedError') {
+  } else if (err.name === 'UnauthorizedError' || err.name === 'JsonWebTokenError') {
     statusCode = 401;
-    message = 'Unauthorized: Invalid or missing authentication';
-    errorCode = 'UNAUTHORIZED';
+    message = 'Authentication required';
+    errorCode = 'AUTH_REQUIRED';
+  } else if (err.name === 'TokenExpiredError') {
+    statusCode = 401;
+    message = 'Authentication token expired';
+    errorCode = 'TOKEN_EXPIRED';
   } else if (err.code === 'ER_DUP_ENTRY') {
     statusCode = 409;
     message = 'Resource already exists';
@@ -31,15 +35,13 @@ const handleError = (err, req, res, next) => {
   }
   
   if (statusCode === 500) {
-    logger.error({
-      message: `${req.method} ${req.originalUrl} - ${err.message}`,
+    logger.error(`${req.method} ${req.originalUrl} - ${err.message}`, {
       error: err,
       stack: err.stack,
       requestId: req.id
     });
   } else {
-    logger.warn({
-      message: `${req.method} ${req.originalUrl} - ${err.message}`,
+    logger.warn(`${req.method} ${req.originalUrl} - ${err.message}`, {
       statusCode,
       requestId: req.id
     });

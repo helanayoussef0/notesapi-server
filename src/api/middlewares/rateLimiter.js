@@ -2,6 +2,10 @@ const rateLimit = require('express-rate-limit');
 const logger = require('../../utils/logger');
 
 const createRateLimiter = (options = {}) => {
+  if (process.env.NODE_ENV === 'test') {
+    return (req, res, next) => next();
+  }
+
   const defaultOptions = {
     windowMs: 15 * 60 * 1000, 
     max: 100,
