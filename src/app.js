@@ -3,8 +3,9 @@ const express = require('express');
 const cors = require('cors');
 const helmet = require('helmet');
 const compression = require('compression');
-const swaggerJSDoc = require('swagger-jsdoc');
 const swaggerUi = require('swagger-ui-express');
+const YAML = require('yamljs');
+const path = require('path');
 const { v4: uuidv4 } = require('uuid');
 
 const { db, testConnection } = require('./config/database');
@@ -17,39 +18,24 @@ const notesRoutes = require('./api/routes/notes');
 
 const app = express();
 
-const swaggerOptions = {
-  definition: {
+let swaggerSpec;
+try {
+  swaggerSpec = YAML.load(path.join(__dirname, '../swagger.yaml'));
+  
+  if (swaggerSpec.servers && swaggerSpec.servers.length > 0) {
+    swaggerSpec.servers[0].url = process.env.API_URL || 'http://localhost:3000';
+  }
+} catch (error) {
+  logger.error(`Failed to load Swagger document: ${error.message}`);
+  swaggerSpec = {
     openapi: '3.0.0',
     info: {
       title: 'Notes API',
       version: '1.0.0',
-      description: 'Secure and scalable RESTful API for managing notes'
-    },
-    servers: [
-      {
-        url: process.env.API_URL || 'http://localhost:3000',
-        description: 'Development server'
-      }
-    ],
-    components: {
-      securitySchemes: {
-        bearerAuth: {
-          type: 'http',
-          scheme: 'bearer',
-          bearerFormat: 'JWT'
-        }
-      }
-    },
-    security: [
-      {
-        bearerAuth: []
-      }
-    ]
-  },
-  apis: ['./src/api/routes/*.js']
-};
-
-const swaggerSpec = swaggerJSDoc(swaggerOptions);
+      description: 'API documentation unavailable'
+    }
+  };
+}
 
 app.use(helmet()); 
 app.use(cors()); 
@@ -76,7 +62,20 @@ app.use(globalLimiter);
 app.use('/api/auth', authRoutes);
 app.use('/api/notes', notesRoutes);
 
-app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
+app.use('/api-docs', 
+  swaggerUi.serve, 
+  swaggerUi.setup(swaggerSpec, {
+    customCss: '.swagger-ui .topbar { display: none }',
+    customSiteTitle: 'Notes API Documentation',
+    customfavIcon: '/favicon.ico',
+    swaggerOptions: {
+      persistAuthorization: true,
+      displayRequestDuration: true,
+      filter: true,
+      tryItOutEnabled: true
+    }
+  })
+);
 
 app.get('/health', async (req, res) => {
   try {
