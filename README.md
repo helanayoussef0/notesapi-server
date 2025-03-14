@@ -71,7 +71,7 @@ A secure and scalable RESTful API that allows users to create, read, update, and
 1. Clone the repository:
    ```bash
    git clone <repository-url>
-   cd notes-api
+   cd notesapi
    ```
 
 2. Install dependencies:
@@ -123,15 +123,6 @@ A secure and scalable RESTful API that allows users to create, read, update, and
    c. (Optional) Seed the database:
    ```bash
    npm run seed
-   ```
-
-6. Set up development tools:
-   ```bash
-   # Install global development dependencies
-   npm install -g nodemon
-
-   # Install git hooks for code quality
-   npm run prepare
    ```
 
 ## 💻 Development Setup
