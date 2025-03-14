@@ -223,6 +223,21 @@ http://localhost:3001/api-docs
 - `POST /api/notes/:id/share` - Share a note with another user
 - `GET /api/search?q=:query` - Search notes based on keywords
 
+## API Testing with Postman
+
+This project includes a Postman collection for testing all API endpoints.
+
+### Setup Instructions:
+
+1. Import the collection file from `notes-api-postman-collection.json` into Postman
+2. Create an environment with the following variables:
+   - `baseUrl`: Your API URL (e.g., `http://localhost:3001`)
+   - `token`: Will be filled automatically after registration/login
+3. Execute the requests in the recommended order:
+   - Register a new user
+   - Login
+   - Create/Read/Update/Delete notes
+
 ## 🔒 Security Features
 
 1. **Authentication & Authorization**
