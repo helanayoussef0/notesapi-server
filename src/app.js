@@ -125,7 +125,9 @@ const startServer = async () => {
   }
 };
 
-startServer();
+if (process.env.NODE_ENV !== 'test') {
+    startServer();
+  }
 
 process.on('unhandledRejection', (error) => {
   logger.error('Unhandled Rejection:', error);

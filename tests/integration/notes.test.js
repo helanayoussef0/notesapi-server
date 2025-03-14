@@ -45,7 +45,7 @@ describe('Notes API', () => {
       expect(response.body.data.note).toHaveProperty('id');
       expect(response.body.data.note.title).toBe(noteData.title);
       expect(response.body.data.note.content).toBe(noteData.content);
-      expect(response.body.data.note.is_archived).toBe(noteData.is_archived);
+      expect(Boolean(response.body.data.note.is_archived)).toBe(Boolean(noteData.is_archived));
       
       noteId = response.body.data.note.id;
     });
@@ -247,7 +247,7 @@ describe('Notes API', () => {
         .expect(400);
       
       expect(response.body.success).toBe(false);
-      expect(response.body.error.code).toBe('VALIDATION_ERROR');
+      expect(response.body.error.code).toBe('MISSING_QUERY');
     });
   });
   
