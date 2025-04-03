@@ -196,7 +196,7 @@ npm run test:e2e
 
 Once the application is running, you can access the Swagger documentation at:
 ```
-http://localhost:3001/api-docs
+https://notesapi-wh1h.onrender.com/api-docs
 ```
 
 ### Main Endpoints
